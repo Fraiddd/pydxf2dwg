@@ -3,9 +3,21 @@
 from pyautocad import Autocad
 from tkinter import Tk, filedialog, messagebox as mb
 import time
+import win32gui
+import win32con
 
 # Connect to Autocad.
 acad = Autocad()
+
+def gethandlewin(winame):
+    rslts = []
+    ret = None
+    win32gui.EnumWindows(lambda h, liste: liste.append(h), rslts)
+    for handle in rslts:
+        res = win32gui.GetWindowText(handle)
+        if winame in res:
+            ret = handle
+    return ret
 
 def pydxf2dwg(acad):
     doc = acad.ActiveDocument
@@ -20,17 +32,21 @@ def pydxf2dwg(acad):
                                         filetypes = [('DXF files', '*.dxf *.DXF')])
     # If files were found.
     if file_path:
-        acad.prompt('In Progress ...\n')
+        hwin = gethandlewin('Autodesk AutoCAD')
+        win32gui.ShowWindow(hwin, win32con.SW_HIDE)
+
         for fil in file_path:
             # Extract file path name.
             nf = '/'.join(fil.split('/')[-1:])
+            acdc = '(vla-get-documents (vlax-get-acad-object))'
             # time.sleep(1)
+
             # Open a dxf
-            doc.SendCommand('(vla-open (vla-get-documents (vlax-get-acad-object)) "' + fil + '")\n')
+            doc.SendCommand('(vla-open ' + acdc + ' "' + fil + '")\n')
             time.sleep(2)
             # Activate 
-            doc.SendCommand('(vla-activate (vla-item (vla-get-documents (vlax-get-acad-object)) "' + nf + '"))\n')
-            time.sleep(0.5)
+            doc.SendCommand('(vla-activate (vla-item ' + acdc + ' "' + nf + '"))\n')
+            time.sleep(1)
             # Reconnect to Autocad in the new draw.
             acad = Autocad()            
             doc = acad.ActiveDocument
@@ -61,4 +77,4 @@ if acad:
     pydxf2dwg(acad)
 else:
     mb.showerror(title='Error',
-                    message='Autocad must be installed and strated, or unknown error')
+        message='Autocad must be installed and strated, or unknown error')
