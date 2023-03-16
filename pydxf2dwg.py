@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from pyautocad import Autocad
-from tkinter import Tk, filedialog, messagebox
+from tkinter import Tk, filedialog, messagebox as mb
 import time
 
 # Connect to Autocad.
@@ -24,33 +24,35 @@ def pydxf2dwg(acad):
         for fil in file_path:
             # Extract file path name.
             nf = '/'.join(fil.split('/')[-1:])
-            time.sleep(2)
+            # time.sleep(1)
             # Open a dxf
             doc.SendCommand('(vla-open (vla-get-documents (vlax-get-acad-object)) "' + fil + '")\n')
-            time.sleep(4)
+            time.sleep(2)
             # Activate 
             doc.SendCommand('(vla-activate (vla-item (vla-get-documents (vlax-get-acad-object)) "' + nf + '"))\n')
-            time.sleep(3)
+            time.sleep(0.5)
             # Reconnect to Autocad in the new draw.
             acad = Autocad()            
             doc = acad.ActiveDocument
             # Current layer "0"
-            doc.SetVariable('clayer', "0")
+            # doc.SetVariable('clayer', "0")
             # Insertion unit in meter.
-            doc.SetVariable('insunits', 6)
+            # doc.SetVariable('insunits', 6)
             # Focus
-            acad.app.ZoomExtents()
+            # acad.app.ZoomExtents()
+            # time.sleep(2)
             # Save with .dxf name.
-            time.sleep(2)
             doc.SaveAs(fil[:-3] + 'dwg')
-            time.sleep(2)
+            time.sleep(1)
             doc.close()
-            time.sleep(4)
+            time.sleep(1)
             # Reconnect to Autocad in the drawing1.
             acad = Autocad()            
             doc = acad.ActiveDocument
+        mb.showinfo(title='Done',
+                    message= str(len(file_path)) + ' files processed.')
     else:
-        messagebox.showerror(title='Error',
+        mb.showerror(title='Error',
                     message='No file, or you lost your way ...')
 
 
@@ -58,5 +60,5 @@ def pydxf2dwg(acad):
 if acad:
     pydxf2dwg(acad)
 else:
-    messagebox.showerror(title='Error',
+    mb.showerror(title='Error',
                     message='Autocad must be installed and strated, or unknown error')
