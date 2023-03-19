@@ -1,3 +1,0 @@
-c:/
-False
-None
