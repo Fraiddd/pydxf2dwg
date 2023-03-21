@@ -8,8 +8,7 @@ pydxf2dwg is a small program in Python 3.11 which convert dxf to dwg.
 
 ## Installation
 
-   - No installation for .exe
-   - for .py you have to install pyautocad
+   - You have to install pyautocad
 
 ```
 pip install pyautocad
